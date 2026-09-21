@@ -1,0 +1,11 @@
+Drop your images in this folder, suggested names (referenced by the site):
+
+  hero.png            - main hero image (device photo or web-UI screenshot)
+  webapp-dashboard.png- P4wnP1 web app main screen
+  wifi.png            - WiFi / nexmon control screen
+  karma.png           - KARMA / captured clients screen
+  hid.png             - HID script editor
+  device.png          - photo of the Pi Zero 2 W (with USB plugged in)
+
+Any extra screenshots go in the gallery. Filenames don't have to match exactly —
+just tell ChatGPT which is which, or it will lay them out in the gallery grid.

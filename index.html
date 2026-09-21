@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pi-sces</title>
+<meta name="description" content="A ready-to-flash OS image that turns a Raspberry Pi Zero 2 W into a self-contained P4wnP1 security appliance.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#0b0b0d; --surface:#141518; --surface-2:#191b1f; --line:#2a2c31;
+  --text:#f4f5f7; --muted:#8b8e96; --accent:#ff5a1f; --accent-2:#ff7a3c;
+  --glow:rgba(255,90,31,.42);
+  --good:#34d17a; --warn:#e0b057; --crit:#ff5147;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --disp:'Space Grotesk',system-ui,sans-serif;
+  --body:'Inter',system-ui,sans-serif;
+  --maxw:1160px;
+}
+:root[data-theme="light"]{
+  --ground:#e3ebdd; --surface:#f8f4ea; --surface-2:#ece5d4; --line:#c2ccb6;
+  --text:#23241f; --muted:#6b6f62; --accent:#a8481f; --accent-2:#c05a2b;
+  --glow:rgba(168,72,31,.24);
+  --good:#2e9e63; --warn:#b07d12; --crit:#b23b2f;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{margin:0;background:var(--ground);color:var(--text);font-family:var(--body);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;position:relative}
+/* film grain + vignette overlays */
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.05;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 26px;position:relative;z-index:2}
+h1,h2,h3{font-family:var(--disp);text-wrap:balance;line-height:1.04;margin:0;letter-spacing:-.03em}
+a{color:inherit}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--accent)}
+
+/* nav */
+nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:color-mix(in srgb,var(--ground) 72%,transparent);border-bottom:1px solid color-mix(in srgb,var(--line) 60%,transparent)}
+.nav-in{display:flex;align-items:center;gap:20px;height:64px;max-width:var(--maxw);margin:0 auto;padding:0 26px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--disp);font-weight:600;font-size:20px;letter-spacing:-.02em;text-decoration:none}
+.brand .glyph{width:24px;height:24px;color:var(--accent);filter:drop-shadow(0 0 6px var(--glow))}
+.nav-links{margin-left:auto;display:flex;gap:24px;align-items:center}
+.nav-links a{font-size:14px;color:var(--muted);text-decoration:none;transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+.nav-links a.cta{color:#03110d;background:var(--accent);padding:9px 18px;border-radius:100px;font-weight:600;box-shadow:0 0 24px -4px var(--glow)}
+.iconbtn{background:none;border:1px solid var(--line);color:var(--muted);width:36px;height:36px;border-radius:100px;cursor:pointer;display:grid;place-items:center}
+.iconbtn:hover{color:var(--text);border-color:var(--accent)}
+@media(max-width:760px){.nav-links a:not(.cta):not(.ghlink){display:none}}
+
+/* HERO — cinematic stage */
+.hero{position:relative;min-height:92vh;display:flex;align-items:center;padding:60px 0 40px;overflow:hidden;isolation:isolate}
+.stage{position:absolute;inset:0;z-index:0}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%}
+.stage .orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.55}
+.stage .orb.a{width:520px;height:520px;background:radial-gradient(circle,var(--accent),transparent 65%);top:-140px;right:-80px}
+.stage .orb.b{width:460px;height:460px;background:radial-gradient(circle,var(--accent-2),transparent 65%);bottom:-160px;left:-120px;opacity:.4}
+.stage::after{content:"";position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 0%,transparent 40%,var(--ground) 100%)}
+.hero-grid{display:grid;grid-template-columns:1.02fr .98fr;gap:40px;align-items:center;width:100%}
+@media(max-width:900px){.hero-grid{grid-template-columns:1fr;gap:20px;text-align:left}}
+.hero h1{font-size:clamp(46px,8vw,88px);font-weight:600;margin:20px 0 22px}
+.hero h1 .g{background:linear-gradient(120deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lede{font-size:19px;color:var(--muted);max-width:44ch}
+.btns{display:flex;gap:14px;margin-top:32px;flex-wrap:wrap}
+.btn{font-family:var(--body);font-weight:600;font-size:15px;padding:14px 26px;border-radius:100px;text-decoration:none;cursor:pointer;border:1px solid transparent;transition:transform .16s,box-shadow .2s,filter .2s}
+.btn:hover{transform:translateY(-2px)}
+.btn.primary{background:var(--accent);color:#03110d;box-shadow:0 0 30px -6px var(--glow)}
+.btn.primary:hover{box-shadow:0 0 44px -4px var(--glow)}
+.btn.ghost{background:color-mix(in srgb,var(--surface) 70%,transparent);border-color:var(--line);color:var(--text);backdrop-filter:blur(6px)}
+.meta-row{display:flex;gap:22px;margin-top:34px;flex-wrap:wrap;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.meta-row b{color:var(--text);font-weight:500}
+
+/* PHONE device */
+.device-wrap{display:flex;justify-content:center;perspective:1400px}
+.phone{width:300px;height:620px;border-radius:44px;background:linear-gradient(160deg,#1a2230,#0a0f17);padding:12px;box-shadow:0 40px 90px -30px rgba(0,0,0,.8),0 0 0 1px var(--line),0 0 60px -20px var(--glow);transform:rotateY(-16deg) rotateX(6deg) rotateZ(1deg);transition:transform .3s ease}
+.device-wrap:hover .phone{transform:rotateY(-8deg) rotateX(3deg)}
+@media(max-width:900px){.phone{transform:none;width:280px;height:580px;margin-top:8px}.device-wrap:hover .phone{transform:none}}
+.screen{width:100%;height:100%;border-radius:34px;background:var(--ground);overflow:hidden;position:relative;border:1px solid #000}
+.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:26px;background:#05070b;border-radius:0 0 16px 16px;z-index:5}
+.scr-top{padding:34px 18px 10px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line)}
+.scr-top .b{font-family:var(--disp);font-weight:600;font-size:15px;display:flex;align-items:center;gap:7px}
+.scr-top .b svg{width:16px;height:16px;color:var(--accent)}
+.scr-live{margin-left:auto;font-family:var(--mono);font-size:9.5px;color:var(--muted);display:flex;align-items:center;gap:5px}
+.scr-live .d{width:6px;height:6px;border-radius:50%;background:var(--good);box-shadow:0 0 8px var(--good);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.scr-body{padding:14px}
+.gauge-row{display:flex;gap:12px;align-items:center;padding:6px 4px 14px;border-bottom:1px solid var(--line);margin-bottom:10px}
+.gauge{width:96px;height:96px;flex:none;filter:drop-shadow(0 0 10px var(--glow))}
+.gauge .gv{font-family:var(--disp);font-weight:600;font-size:26px;fill:var(--text)}
+.gauge .gp{font-size:12px;fill:var(--muted)}
+.gauge .gl{font-family:var(--mono);font-size:9px;letter-spacing:.2em;fill:var(--accent)}
+.stat-col{display:flex;flex-direction:column;gap:8px;flex:1}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 11px}
+.stat .sk{font-family:var(--mono);font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.stat .sv{font-family:var(--disp);font-weight:600;font-size:20px;line-height:1.1;margin-top:2px;font-variant-numeric:tabular-nums}
+.scr-h{font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin:6px 2px 10px}
+.pctl{display:flex;align-items:center;gap:8px;padding:11px 12px;border-radius:12px;background:var(--surface);border:1px solid var(--line);margin-bottom:8px}
+.pctl .l{font-size:12.5px;font-weight:500}
+.pctl .s{font-size:9.5px;color:var(--muted);font-family:var(--mono)}
+.sw{margin-left:auto;width:40px;height:23px;border-radius:20px;background:var(--surface-2);border:1px solid var(--line);position:relative;cursor:pointer;flex:none;transition:background .2s}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:17px;height:17px;border-radius:50%;background:var(--muted);transition:transform .22s,background .22s}
+.sw[aria-checked="true"]{background:color-mix(in srgb,var(--accent) 34%,transparent);border-color:var(--accent)}
+.sw[aria-checked="true"]::after{transform:translateX(17px);background:var(--accent)}
+.sw.dis{opacity:.35;pointer-events:none}
+.pread{margin-top:12px;padding:12px;border-radius:12px;background:#04060a;border:1px solid var(--line);font-family:var(--mono);font-size:10px;line-height:1.9}
+.pread .k{color:var(--muted)}.pread .on{color:var(--good)}.pread .off{color:var(--muted)}
+.pread .hd{color:var(--accent);font-size:8.5px;letter-spacing:.1em;margin-bottom:5px}
+
+/* generic sections */
+section{padding:96px 0;position:relative;z-index:2}
+.sec-head{max-width:60ch;margin-bottom:48px}
+.sec-head h2{font-size:clamp(30px,4.5vw,48px);margin:14px 0 14px}
+.sec-head p{color:var(--muted);font-size:18px;margin:0}
+
+/* bento features */
+.bento{display:grid;grid-template-columns:repeat(6,1fr);gap:16px}
+.tile{background:linear-gradient(180deg,var(--surface),color-mix(in srgb,var(--surface) 80%,var(--ground)));border:1px solid var(--line);border-radius:20px;padding:26px;transition:border-color .25s,transform .25s;position:relative;overflow:hidden}
+.tile:hover{border-color:color-mix(in srgb,var(--accent) 60%,var(--line));transform:translateY(-4px)}
+.tile .ic{width:30px;height:30px;color:var(--accent);margin-bottom:16px;filter:drop-shadow(0 0 8px var(--glow))}
+.tile h3{font-size:19px;margin-bottom:9px}
+.tile p{margin:0;font-size:14px;color:var(--muted)}
+.tile.lg{grid-column:span 3}.tile.md{grid-column:span 2}.tile.sm{grid-column:span 2}
+.tile.lg{grid-row:span 2;display:flex;flex-direction:column;justify-content:space-between}
+.tile.lg .big{font-family:var(--disp);font-size:clamp(28px,4vw,42px);font-weight:600;letter-spacing:-.02em;line-height:1.05;margin-top:20px}
+.tile.lg .big em{font-style:normal;color:var(--accent)}
+@media(max-width:820px){.bento{grid-template-columns:repeat(2,1fr)}.tile.lg,.tile.md,.tile.sm{grid-column:span 1}.tile.lg{grid-row:auto}}
+
+/* demo band */
+.band{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:40px;display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:center;overflow:hidden}
+@media(max-width:820px){.band{grid-template-columns:1fr;padding:28px}}
+.band h2{font-size:clamp(26px,3.6vw,38px);margin-bottom:14px}
+.band p{color:var(--muted);font-size:16px}
+
+/* steps timeline */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative}
+@media(max-width:820px){.steps{grid-template-columns:1fr;gap:10px}}
+.step{padding:26px 22px;border-left:1px solid var(--line);position:relative}
+.step:first-child{border-radius:16px 0 0 16px}
+@media(max-width:820px){.step{border-left:2px solid var(--accent);border-radius:0}}
+.step .n{font-family:var(--mono);font-size:12px;color:var(--accent);margin-bottom:14px}
+.step h3{font-size:18px;margin-bottom:8px}
+.step p{margin:0;font-size:14px;color:var(--muted)}
+.code{position:relative;background:#04060a;border:1px solid var(--line);border-radius:16px;padding:18px 20px;font-family:var(--mono);font-size:13px;color:var(--text);overflow-x:auto;margin-top:26px;line-height:1.85}
+.code button{position:absolute;top:10px;right:10px;background:var(--surface-2);border:1px solid var(--line);color:var(--muted);font-size:11px;padding:5px 11px;border-radius:8px;cursor:pointer;font-family:var(--body)}
+.code button:hover{color:var(--text);border-color:var(--accent)}
+.code .c{color:var(--muted)}
+
+/* cases */
+.cases{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:820px){.cases{grid-template-columns:1fr}}
+.case{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:28px;transition:transform .25s}
+.case:hover{transform:translateY(-4px)}
+.case .tag{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-2)}
+.case h3{font-size:20px;margin:12px 0 10px}
+.case p{margin:0;color:var(--muted);font-size:14px}
+
+/* real app screens */
+.screens{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;justify-items:center}
+@media(max-width:820px){.screens{grid-template-columns:1fr}}
+.appscr{width:290px}
+.appscr .frame{width:290px;height:600px;border-radius:40px;background:linear-gradient(160deg,#1a2230,#0a0f17);padding:11px;box-shadow:0 30px 70px -30px rgba(0,0,0,.7),0 0 0 1px var(--line);transition:transform .3s}
+.appscr:hover .frame{transform:translateY(-6px)}
+.appscr .scn{width:100%;height:100%;border-radius:30px;background:var(--ground);overflow:hidden;position:relative;border:1px solid #000;display:flex;flex-direction:column}
+.appscr .cap{text-align:center;margin-top:14px;font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.06em}
+.ahead{padding:26px 15px 11px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line)}
+.ahead .t{font-family:var(--disp);font-weight:600;font-size:15px;display:flex;align-items:center;gap:6px}
+.ahead .t svg{width:15px;height:15px;color:var(--accent)}
+.ahead .dot{margin-left:auto;font-family:var(--mono);font-size:9px;color:var(--muted);display:flex;align-items:center;gap:5px}
+.ahead .dot .d{width:6px;height:6px;border-radius:50%;box-shadow:0 0 8px currentColor}
+.ahead .dot.up .d{background:var(--good);color:var(--good)}
+.ahead .dot.warn .d{background:var(--warn);color:var(--warn)}
+.abody{padding:13px;overflow:hidden;flex:1}
+.aeye{font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin:4px 2px 9px}
+.acard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px 12px;margin-bottom:8px}
+.arow{display:flex;align-items:center;gap:8px}
+.arow .l{font-size:12px;font-weight:500}
+.arow .s{font-size:9px;color:var(--muted);font-family:var(--mono);margin-top:1px}
+.arow .sw{margin-left:auto}
+.kv{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;padding:3px 0}
+.kv .k{color:var(--muted)}.kv .v{color:var(--text)}
+.pill{font-family:var(--mono);font-size:8.5px;padding:2px 7px;border-radius:20px;border:1px solid var(--line);color:var(--muted);letter-spacing:.08em}
+.pill.up{color:var(--good);border-color:color-mix(in srgb,var(--good) 45%,transparent)}
+.tilegrid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.mtile{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:10px}
+.mtile .mt{font-size:11.5px;font-weight:600}
+.mtile .ms{font-size:8.5px;color:var(--muted);font-family:var(--mono);margin-top:2px;line-height:1.3}
+.aconsole{background:#04060a;border:1px solid var(--line);border-radius:11px;padding:10px;font-family:var(--mono);font-size:9px;line-height:1.7;color:var(--muted)}
+.aconsole .g{color:var(--good)}.aconsole .a{color:var(--accent)}
+.evrow{display:flex;align-items:center;gap:7px;padding:7px 0;border-bottom:1px dashed var(--line);font-family:var(--mono);font-size:9.5px}
+.evrow:last-child{border:none}
+.evtag{font-size:7.5px;padding:2px 5px;border-radius:5px;letter-spacing:.06em;flex:none}
+.evtag.st{background:color-mix(in srgb,var(--good) 18%,transparent);color:var(--good)}
+.evtag.tr{background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent)}
+.evtag.hid{background:color-mix(in srgb,var(--accent-2) 20%,transparent);color:var(--accent-2)}
+.evrow .tx{color:var(--text);flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.evrow .tm{color:var(--muted)}
+
+/* specs */
+.specs{background:var(--surface);border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.specs table{width:100%;border-collapse:collapse;font-size:14px}
+.specs td{padding:16px 24px;border-bottom:1px solid var(--line)}
+.specs tr:last-child td{border-bottom:none}
+.specs td:first-child{color:var(--muted);width:38%;font-family:var(--mono);font-size:13px}
+.specs td:last-child{font-weight:500}
+
+/* disclaimer */
+.disc{background:linear-gradient(180deg,color-mix(in srgb,var(--crit) 10%,var(--surface)),var(--surface));border:1px solid color-mix(in srgb,var(--crit) 38%,var(--line));border-radius:24px;padding:36px 40px}
+.disc h3{font-size:20px;color:var(--crit);margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.disc p{color:var(--muted);font-size:14px;margin:0 0 12px;max-width:78ch}
+.disc strong{color:var(--text)}
+
+footer{border-top:1px solid var(--line);padding:48px 0;margin-top:20px}
+.foot{display:flex;gap:22px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:14px}
+.foot a{color:var(--accent);text-decoration:none}
+.foot .sp{margin-left:auto}
+
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+.reveal.in{opacity:1;transform:none}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-in">
+    <a class="brand" href="#top">
+      <svg class="glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12c4-6 14-6 18 0-4 6-14 6-18 0z"/><circle cx="16" cy="12" r="1.4" fill="currentColor" stroke="none"/><path d="M3 12l-1.6-3M3 12l-1.6 3"/></svg>
+      Pi-sces
+    </a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#demo">Live panel</a>
+      <a href="#start">Quick start</a>
+      <a href="#disclaimer">Disclaimer</a>
+      <button class="iconbtn" id="theme" aria-label="Toggle theme" title="Toggle theme">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.4 1.4M17.6 17.6L19 19M19 5l-1.4 1.4M6.4 17.6L5 19"/></svg>
+      </button>
+      <a class="cta ghlink" href="#" id="gh1">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<div id="top"></div>
+<header class="hero">
+  <div class="stage"><span class="orb a"></span><span class="orb b"></span><canvas id="waves"></canvas></div>
+  <div class="wrap">
+    <div class="hero-grid">
+      <div class="reveal in">
+        <div class="eyebrow">Raspberry Pi Zero 2 W · P4wnP1 A.L.O.A.</div>
+        <h1>The pocket <span class="g">WiFi &amp; USB</span> attack platform.</h1>
+        <p class="lede">Flash one image. Plug in the Pi. It boots into its own access point — nexmon monitor &amp; injection, KARMA rogue-AP, USB HID gadget — all driven from a clean web app. No desktop. No setup.</p>
+        <div class="btns">
+          <a class="btn primary" href="#" id="gh2">Get it on GitHub</a>
+          <a class="btn ghost" href="#start">See how it works</a>
+        </div>
+        <div class="meta-row">
+          <span><b>bcm43436b0</b> nexmon</span>
+          <span><b>arm64</b> Kali headless</span>
+          <span><b>172.24.0.1</b> first boot</span>
+        </div>
+      </div>
+      <div class="device-wrap reveal in">
+        <div class="phone">
+          <div class="screen">
+            <div class="notch"></div>
+            <div class="scr-top">
+              <span class="b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12c4-6 14-6 18 0-4 6-14 6-18 0z"/><circle cx="16" cy="12" r="1.4" fill="currentColor" stroke="none"/></svg> Pi-sces</span>
+              <span class="scr-live"><span class="d"></span>172.24.0.1</span>
+            </div>
+            <div class="scr-body">
+              <div class="gauge-row">
+                <svg class="gauge" viewBox="0 0 120 120" aria-label="Link 62%">
+                  <circle cx="60" cy="60" r="50" fill="none" stroke="var(--surface-2)" stroke-width="9"/>
+                  <circle cx="60" cy="60" r="50" fill="none" stroke="var(--accent)" stroke-width="9" stroke-linecap="round" stroke-dasharray="314" stroke-dashoffset="119" transform="rotate(-90 60 60)"/>
+                  <text x="60" y="56" text-anchor="middle" class="gv">62<tspan class="gp">%</tspan></text>
+                  <text x="60" y="74" text-anchor="middle" class="gl">LINK</text>
+                </svg>
+                <div class="stat-col">
+                  <div class="stat"><div class="sk">Uptime</div><div class="sv">04:17</div></div>
+                  <div class="stat"><div class="sk">Channel</div><div class="sv">6</div></div>
+                </div>
+              </div>
+              <div class="scr-h">Capabilities · tap to toggle</div>
+              <div id="pcontrols"></div>
+              <div class="pread" id="pread"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+<section id="features">
+  <div class="sec-head reveal">
+    <div class="eyebrow">Capabilities</div>
+    <h2>Everything baked in. Nothing to configure on first boot.</h2>
+    <p>Eight capabilities ship on the image — each surfaced in the app only when your hardware actually supports it.</p>
+  </div>
+  <div class="bento">
+    <div class="tile lg reveal">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2 4 6v6c0 5 3.4 8 8 10 4.6-2 8-5 8-10V6z"/><path d="M9 12l2 2 4-4"/></svg>
+      <div>
+        <h3>Nexmon firmware</h3>
+        <p>Patched Broadcom firmware on the internal chip — real monitor mode and frame injection, no external adapter.</p>
+      </div>
+      <div class="big">Monitor. Inject.<br><em>From the chip inside.</em></div>
+    </div>
+    <div class="tile md reveal"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 12a8 8 0 0 1 16 0M8 12a4 4 0 0 1 8 0"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/></svg><h3>KARMA rogue-AP</h3><p>Answers any probe, harvests associating clients into an exportable record.</p></div>
+    <div class="tile sm reveal"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 6h4"/></svg><h3>USB composite</h3><p>RNDIS + CDC-ECM adapters plus HID keyboard, mouse, raw.</p></div>
+    <div class="tile md reveal"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8M12 18v3"/></svg><h3>Full web control</h3><p>P4wnP1 web app + gRPC + CLI. WiFi, USB, HID, automations, event log.</p></div>
+    <div class="tile sm reveal"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 12h14M12 5l7 7-7 7"/></svg><h3>Plug in &amp; go</h3><p>Boots into its own AP. Join, browse, you're in.</p></div>
+    <div class="tile md reveal"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 17l6-6-6-6M12 19h8"/></svg><h3>HID scripting</h3><p>On-device keystroke-injection scripting, job manager, trigger automations.</p></div>
+    <div class="tile sm reveal"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg><h3>Capability-aware</h3><p>The UI shows only what actually works — never a dead button.</p></div>
+  </div>
+</section>
+
+<section id="demo">
+  <div class="band reveal">
+    <div>
+      <div class="eyebrow">Try it</div>
+      <h2>The control panel, live.</h2>
+      <p>Flip a capability — nexmon gates monitor mode and KARMA, exactly like the real device's capability descriptor drives the app. This is a working demo; the real panel talks gRPC to the Pi.</p>
+      <div class="btns"><a class="btn ghost" href="#start">Read the quick start</a></div>
+    </div>
+    <div id="bigpanel"></div>
+  </div>
+</section>
+
+<section id="start">
+  <div class="sec-head reveal">
+    <div class="eyebrow">Quick start</div>
+    <h2>From SD card to running appliance in four steps.</h2>
+  </div>
+  <div class="steps reveal" id="steps"></div>
+  <div class="code reveal"><button data-copy>Copy</button><span class="c"># flash, then join the AP and open the web app</span><br>
+xz -d Pi-sces.img.xz<br>
+sudo dd if=Pi-sces.img of=/dev/sdX bs=4M status=progress conv=fsync<br>
+<span class="c"># join WiFi "P4wnP1" → browse to</span> http://172.24.0.1:8000</div>
+</section>
+
+<section id="cases">
+  <div class="sec-head reveal">
+    <div class="eyebrow">Use cases</div>
+    <h2>Pocket-sized. Engagement-ready.</h2>
+  </div>
+  <div class="cases" id="cases"></div>
+</section>
+
+<section id="gallery">
+  <div class="sec-head reveal">
+    <div class="eyebrow">The app</div>
+    <h2>Real pages from the Pisces app.</h2>
+    <p>Rebuilt from the shipping Compose UI — same operator language, same labels, same telemetry console.</p>
+  </div>
+  <div class="screens" id="screens"></div>
+</section>
+
+<section id="specs">
+  <div class="sec-head reveal">
+    <div class="eyebrow">Tech specs</div>
+    <h2>Under the hood.</h2>
+  </div>
+  <div class="specs reveal"><table id="specstbl"></table></div>
+</section>
+
+<section id="disclaimer">
+  <div class="disc reveal">
+    <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg> For authorized security testing and education only.</h3>
+    <p>Pi-sces is a security research and penetration-testing tool, intended solely for use on networks, devices, and systems that you own or have explicit, written authorization to test. WiFi monitoring, packet injection, rogue access points (KARMA), credential harvesting, and USB HID injection may be illegal to use against systems you do not own or lack permission to assess.</p>
+    <p>You are solely responsible for complying with all applicable laws. The authors and contributors accept <strong>no liability</strong> for misuse, damage, or any consequences arising from use of this software. It is provided <strong>"as is", without warranty of any kind</strong>. Unauthorized use against third-party systems is illegal and unethical. Don't.</p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span class="brand" style="font-size:17px">Pi-sces</span>
+    <span>Built on P4wnP1 A.L.O.A. &amp; Kali Linux</span>
+    <span class="sp"></span>
+    <a href="#" id="gh3">GitHub repo →</a>
+  </div>
+</footer>
+
+<script>
+var REPO="https://github.com/darufusonfire/pi-sces";
+["gh1","gh2","gh3"].forEach(function(id){var e=document.getElementById(id);if(e)e.href=REPO;});
+
+var root=document.documentElement, tb=document.getElementById('theme');
+tb.addEventListener('click',function(){
+  var cur=root.getAttribute('data-theme');
+  var dark=cur? cur==='dark' : !matchMedia('(prefers-color-scheme:light)').matches;
+  root.setAttribute('data-theme', dark?'light':'dark');
+});
+
+// shared capability state (phone + big panel mirror it)
+var CAPS=[
+  {id:'nexmon',lbl:'Nexmon firmware',sub:'unlocks monitor + injection'},
+  {id:'monitor',lbl:'Monitor mode',sub:'wlan0 capture',needs:'nexmon'},
+  {id:'karma',lbl:'KARMA rogue-AP',sub:'harvest clients',needs:'nexmon'},
+  {id:'usb',lbl:'USB composite',sub:'RNDIS+ECM+HID'}
+];
+var state={nexmon:true,monitor:false,karma:false,usb:true};
+var seed=6;
+
+function swHTML(c,cls){var dis=c.needs&&!state[c.needs];
+  return '<div class="'+cls.ctl+'"><div><div class="'+cls.l+'">'+c.lbl+'</div><div class="'+cls.s+'">'+(dis?'requires nexmon':c.sub)+'</div></div>'+
+    '<div class="sw '+(dis?'dis':'')+'" role="switch" tabindex="0" data-id="'+c.id+'" aria-checked="'+(!!state[c.id]&&!dis)+'"></div></div>';}
+
+function bind(scope){scope.querySelectorAll('.sw').forEach(function(sw){
+  function tog(){var id=sw.dataset.id;if(sw.classList.contains('dis'))return;state[id]=!state[id];
+    if(id==='nexmon'&&!state[id]){state.monitor=false;state.karma=false;}
+    if(id==='karma'&&state[id]){seed=3+Math.floor(Math.random()*9);}drawAll();}
+  sw.addEventListener('click',tog);
+  sw.addEventListener('keydown',function(e){if(e.key===' '||e.key==='Enter'){e.preventDefault();tog();}});
+});}
+
+function readoutHTML(sizeClass){
+  function row(k,on){var pad=(k+' ').padEnd(15,'·');return '<div><span class="k">'+pad+'</span> <span class="'+(on?'on':'off')+'">'+(on?'active':'idle')+'</span></div>';}
+  return '<div class="hd">/run/pisces/nexmon-caps.json</div>'+row('nexmon',state.nexmon)+row('monitor_mode',state.monitor)+row('injection',state.nexmon)+row('karma',state.karma)+row('usb_gadget',state.usb)+
+    '<div style="margin-top:8px" class="k">clients_seen: <span class="on">'+(state.karma?seed:0)+'</span></div>';
+}
+
+function drawAll(){
+  var pc=document.getElementById('pcontrols');
+  pc.innerHTML=CAPS.map(function(c){return swHTML(c,{ctl:'pctl',l:'l',s:'s'});}).join('');
+  document.getElementById('pread').innerHTML=readoutHTML();
+  bind(pc);
+  var bp=document.getElementById('bigpanel');
+  bp.innerHTML='<div style="background:#04060a;border:1px solid var(--line);border-radius:18px;overflow:hidden">'+
+    '<div style="display:flex;align-items:center;gap:8px;padding:14px 18px;border-bottom:1px solid var(--line);background:var(--surface-2)"><span style="font-family:var(--disp);font-weight:600;font-size:15px">Pi-sces Control</span><span style="margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px"><span style="width:7px;height:7px;border-radius:50%;background:var(--good);box-shadow:0 0 8px var(--good)"></span>connected</span></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr">'+
+      '<div id="bpctl" style="padding:16px;border-right:1px solid var(--line)"></div>'+
+      '<div id="bpread" style="padding:16px;font-family:var(--mono);font-size:12px;line-height:1.85;background:#02040700"></div>'+
+    '</div></div>';
+  var bpctl=document.getElementById('bpctl');
+  bpctl.innerHTML=CAPS.map(function(c){return swHTML(c,{ctl:'pctl',l:'l',s:'s'});}).join('');
+  document.getElementById('bpread').innerHTML=readoutHTML();
+  bind(bpctl);
+}
+drawAll();
+
+// steps
+var STEPS=[['Flash','Decompress and write Pi-sces.img to a microSD card.'],['Boot','Insert the card, power the Pi Zero 2 W. First boot takes a minute.'],['Connect','Join its WiFi network "P4wnP1" from your phone or laptop.'],['Control','Open 172.24.0.1:8000 — enable nexmon, start KARMA, run scripts.']];
+document.getElementById('steps').innerHTML=STEPS.map(function(s,i){return '<div class="step"><div class="n">0'+(i+1)+'</div><h3>'+s[0]+'</h3><p>'+s[1]+'</p></div>';}).join('');
+
+// cases
+var CASES=[['Field','Wireless assessment','Drop it in range, connect from your phone, run monitor-mode capture and KARMA harvesting without hauling a full rig.'],['Access','USB plug-in payloads','Plug into a host: it enumerates as keyboard + network adapter. Deliver HID scripts and pivot over USB networking.'],['Teach','Security education','A safe, contained way to demonstrate WiFi attacks, rogue APs, and HID injection on hardware you control.']];
+document.getElementById('cases').innerHTML=CASES.map(function(c){return '<div class="case reveal"><span class="tag">'+c[0]+'</span><h3>'+c[1]+'</h3><p>'+c[2]+'</p></div>';}).join('');
+
+// real app screens (rebuilt from the shipping Compose UI)
+var fishSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12c4-6 14-6 18 0-4 6-14 6-18 0z"/><circle cx="16" cy="12" r="1.4" fill="currentColor" stroke="none"/></svg>';
+function head(title,state,label){return '<div class="ahead"><span class="t">'+fishSvg+' '+title+'</span><span class="dot '+state+'"><span class="d"></span>'+label+'</span></div>';}
+function swOn(on){return '<div class="sw" role="switch" aria-checked="'+on+'"></div>';}
+
+// HOME
+var home='<div class="appscr reveal"><div class="frame"><div class="scn">'+head('Pisces','up','172.24.0.1')+
+'<div class="abody">'+
+  '<div class="aeye">Link status</div>'+
+  '<div class="acard"><div class="kv"><span class="k">Host</span><span class="v">172.24.0.1</span></div><div class="kv"><span class="k">Port</span><span class="v">50051</span></div><div class="kv"><span class="k">Transport</span><span class="v">WiFi-AP</span></div><div style="margin-top:6px"><span class="pill up">SYNC</span></div></div>'+
+  '<div class="aeye" style="margin-top:12px">Controls</div>'+
+  '<div class="tilegrid">'+
+    '<div class="mtile"><div class="mt">WiFi</div><div class="ms">Access point and client</div></div>'+
+    '<div class="mtile"><div class="mt">USB gadget</div><div class="ms">Keyboard, storage, network</div></div>'+
+    '<div class="mtile"><div class="mt">Nexmon</div><div class="ms">RF operations</div></div>'+
+    '<div class="mtile"><div class="mt">HID jobs</div><div class="ms">Run and watch scripts</div></div>'+
+    '<div class="mtile"><div class="mt">Automation</div><div class="ms">Automate on events</div></div>'+
+    '<div class="mtile"><div class="mt">Event log</div><div class="ms">Live device events</div></div>'+
+  '</div>'+
+'</div></div></div><div class="cap">Home</div></div>';
+
+// NEXMON
+var nexmon='<div class="appscr reveal"><div class="frame"><div class="scn">'+head('Nexmon','up','armed')+
+'<div class="abody">'+
+  '<div class="aeye">Nexmon · RF operations</div>'+
+  '<div class="acard"><div class="arow"><div><div class="l">Nexmon firmware</div><div class="s">Chip bcm43436b0</div></div>'+swOn(true)+'</div></div>'+
+  '<div class="acard"><div class="arow"><div><div class="l">Monitor mode</div><div class="s">wlan0 · live capture</div></div>'+swOn(true)+'</div></div>'+
+  '<div class="acard"><div class="arow"><div><div class="l">Packet injection</div><div class="s">tested · ok</div></div>'+swOn(true)+'</div></div>'+
+  '<div class="acard"><div class="kv"><span class="k">Capture channel</span><span class="v">Channel 6</span></div></div>'+
+  '<div class="aeye" style="margin-top:12px">KARMA · rogue access point</div>'+
+  '<div class="acard"><div class="arow"><div><div class="l">Probe responses</div><div class="s">Answer every probe</div></div>'+swOn(true)+'</div></div>'+
+  '<div class="aconsole" style="margin-top:8px"><span class="a">live capture</span> · harvested clients<br><span class="g">✔</span> aa:bb · "HomeWiFi"<br><span class="g">✔</span> 3c:1e · "CoffeeShop"</div>'+
+'</div></div></div><div class="cap">Nexmon</div></div>';
+
+// EVENT LOG
+var EV=[['st','STATE','WiFi AP started','12:04:07'],['tr','TRIGGER','USB host connected','12:04:19'],['hid','HID','job #7 finished','12:05:02'],['st','STATE','monitor mode on','12:05:44'],['tr','TRIGGER','client associated','12:06:10'],['hid','HID','duckyscript run','12:06:31']];
+var evlog='<div class="appscr reveal"><div class="frame"><div class="scn">'+head('Event log','up','streaming')+
+'<div class="abody">'+
+  '<div class="aeye">Event stream · '+EV.length+' events</div>'+
+  EV.map(function(e){return '<div class="evrow"><span class="evtag '+e[0]+'">'+e[1]+'</span><span class="tx">'+e[2]+'</span><span class="tm">'+e[3]+'</span></div>';}).join('')+
+  '<div class="aconsole" style="margin-top:10px"><span class="a">EVT</span> live events streamed from the Pi…<span class="g"> ▊</span></div>'+
+'</div></div></div><div class="cap">Event log</div></div>';
+
+document.getElementById('screens').innerHTML=home+nexmon+evlog;
+
+// specs
+var SPECS=[['Target hardware','Raspberry Pi Zero 2 W'],['WiFi chip','Broadcom bcm43436b0 · nexmon-patched'],['Architecture','arm64'],['Base OS','Kali Linux ARM · headless'],['Control','P4wnP1 A.L.O.A. web app + gRPC + CLI'],['First-boot AP','SSID P4wnP1 · 172.24.0.1 · :8000'],['USB gadget','RNDIS + CDC-ECM + HID (kbd/mouse/raw)']];
+document.getElementById('specstbl').innerHTML=SPECS.map(function(s){return '<tr><td>'+s[0]+'</td><td>'+s[1]+'</td></tr>';}).join('');
+
+// copy
+document.querySelectorAll('[data-copy]').forEach(function(b){b.addEventListener('click',function(){var t=b.parentElement.innerText.replace(/^Copy/,'').trim();navigator.clipboard.writeText(t).then(function(){b.textContent='Copied';setTimeout(function(){b.textContent='Copy';},1400);});});});
+
+// reveal
+var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(function(e){io.observe(e);});
+
+// hero waves
+(function(){var c=document.getElementById('waves');if(!c)return;var x=c.getContext('2d'),w,h,t=0;
+  var reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  function rs(){w=c.width=c.offsetWidth*devicePixelRatio;h=c.height=c.offsetHeight*devicePixelRatio;}rs();addEventListener('resize',rs);
+  function col(){return getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();}
+  function frame(){x.clearRect(0,0,w,h);var a=col();
+    for(var k=0;k<4;k++){x.beginPath();x.globalAlpha=.09-k*.017;x.lineWidth=1.3*devicePixelRatio;x.strokeStyle=a;
+      for(var i=0;i<=w;i+=6){var y=h*0.62+Math.sin(i*0.0052+t+k*1.1)*(46+k*20)*devicePixelRatio+Math.sin(i*0.011+t*1.3)*16*devicePixelRatio;i===0?x.moveTo(i,y):x.lineTo(i,y);}x.stroke();}
+    t+=0.011;requestAnimationFrame(frame);}
+  if(reduce){x.globalAlpha=.07;x.strokeStyle=col();x.beginPath();for(var i=0;i<=w;i+=6){var y=h*.62+Math.sin(i*.0052)*46*devicePixelRatio;i===0?x.moveTo(i,y):x.lineTo(i,y);}x.stroke();}else frame();
+})();
+</script>
+</body>
+</html>
