@@ -69,6 +69,9 @@ nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:color
 .btn.primary{background:var(--accent);color:#03110d;box-shadow:0 0 30px -6px var(--glow)}
 .btn.primary:hover{box-shadow:0 0 44px -4px var(--glow)}
 .btn.ghost{background:color-mix(in srgb,var(--surface) 70%,transparent);border-color:var(--line);color:var(--text);backdrop-filter:blur(6px)}
+.dlnote{margin-top:14px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.dlnote a{color:var(--accent);text-decoration:none}
+.dlnote code{color:var(--text);font-size:11px}
 .meta-row{display:flex;gap:22px;margin-top:34px;flex-wrap:wrap;font-family:var(--mono);font-size:12px;color:var(--muted)}
 .meta-row b{color:var(--text);font-weight:500}
 
@@ -250,9 +253,10 @@ footer{border-top:1px solid var(--line);padding:48px 0;margin-top:20px}
         <h1>The pocket <span class="g">WiFi &amp; USB</span> attack platform.</h1>
         <p class="lede">Flash one image. Plug in the Pi. It boots into its own access point — nexmon monitor &amp; injection, KARMA rogue-AP, USB HID gadget — all driven from a clean web app. No desktop. No setup.</p>
         <div class="btns">
-          <a class="btn primary" href="#" id="gh2">Get it on GitHub</a>
-          <a class="btn ghost" href="#start">See how it works</a>
+          <a class="btn primary" href="#" id="dl">Download image · 435 MB</a>
+          <a class="btn ghost" href="#" id="gh2">View on GitHub</a>
         </div>
+        <div class="dlnote" id="dlnote"></div>
         <div class="meta-row">
           <span><b>bcm43436b0</b> nexmon</span>
           <span><b>arm64</b> Kali headless</span>
@@ -386,8 +390,14 @@ sudo dd if=Pi-sces.img of=/dev/sdX bs=4M status=progress conv=fsync<br>
 </footer>
 
 <script>
-var REPO="https://github.com/pi-sces";
+var REPO="https://github.com/pi-sces/pi-sces.github.io";
+var RELEASE="https://github.com/pi-sces/pi-sces.github.io/releases/tag/v1.0.0";
+var DL="https://github.com/pi-sces/pi-sces.github.io/releases/download/v1.0.0/Pi-sces.img.xz";
+var SHA="84cb4df4400f6d761e2fc7f6efdbf0d1f1ded0733dc521819d81cf376761a3f3";
 ["gh1","gh2","gh3"].forEach(function(id){var e=document.getElementById(id);if(e)e.href=REPO;});
+var dl=document.getElementById('dl'); if(dl) dl.href=DL;
+var dn=document.getElementById('dlnote');
+if(dn) dn.innerHTML='v1.0.0 · <a href="'+RELEASE+'">release notes</a> · SHA-256 <code>'+SHA.slice(0,16)+'…</code>';
 
 var root=document.documentElement, tb=document.getElementById('theme');
 tb.addEventListener('click',function(){
