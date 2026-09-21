@@ -208,6 +208,22 @@ section{padding:96px 0;position:relative;z-index:2}
 .specs td:first-child{color:var(--muted);width:38%;font-family:var(--mono);font-size:13px}
 .specs td:last-child{font-weight:500}
 
+/* download */
+.dlcard{display:grid;grid-template-columns:1.05fr .95fr;gap:36px;background:linear-gradient(160deg,var(--surface),color-mix(in srgb,var(--surface) 82%,var(--ground)));border:1px solid var(--line);border-radius:24px;padding:40px;position:relative;overflow:hidden}
+.dlcard::before{content:"";position:absolute;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle,var(--accent),transparent 65%);opacity:.14;top:-160px;right:-120px;filter:blur(50px)}
+@media(max-width:820px){.dlcard{grid-template-columns:1fr;padding:28px}}
+.dlleft h2{font-size:clamp(30px,4vw,44px);margin:12px 0 12px}
+.dlleft p{color:var(--muted);font-size:16px;margin:0 0 26px;max-width:44ch}
+.dlleft em{color:var(--accent);font-style:normal}
+.dlbig{display:inline-block;font-size:16px;padding:16px 30px}
+.dlmeta{margin-top:16px;font-family:var(--mono);font-size:12px;color:var(--muted);line-height:1.8}
+.dlmeta a{color:var(--accent);text-decoration:none}
+.dlmeta code{color:var(--text);font-size:11px;word-break:break-all}
+.dlright{display:flex;align-items:center}
+.dlflash{background:var(--ground);border:1px solid var(--line);border-radius:16px;padding:22px;width:100%}
+.dlflash .fh{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.dlflash p{color:var(--muted);font-size:14px;margin:0}
+.dlflash code{font-family:var(--mono);font-size:12px;color:var(--text)}
 /* disclaimer */
 .disc{background:linear-gradient(180deg,color-mix(in srgb,var(--crit) 10%,var(--surface)),var(--surface));border:1px solid color-mix(in srgb,var(--crit) 38%,var(--line));border-radius:24px;padding:36px 40px}
 .disc h3{font-size:20px;color:var(--crit);margin-bottom:14px;display:flex;align-items:center;gap:12px}
@@ -234,11 +250,11 @@ footer{border-top:1px solid var(--line);padding:48px 0;margin-top:20px}
       <a href="#features">Features</a>
       <a href="#demo">Live panel</a>
       <a href="#start">Quick start</a>
-      <a href="#disclaimer">Disclaimer</a>
+      <a href="#" id="gh1" class="ghlink">GitHub</a>
       <button class="iconbtn" id="theme" aria-label="Toggle theme" title="Toggle theme">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.4 1.4M17.6 17.6L19 19M19 5l-1.4 1.4M6.4 17.6L5 19"/></svg>
       </button>
-      <a class="cta ghlink" href="#" id="gh1">GitHub</a>
+      <a class="cta" href="#download" id="navdl">↓ Download</a>
     </div>
   </div>
 </nav>
@@ -253,8 +269,8 @@ footer{border-top:1px solid var(--line);padding:48px 0;margin-top:20px}
         <h1>The pocket <span class="g">WiFi &amp; USB</span> attack platform.</h1>
         <p class="lede">Flash one image. Plug in the Pi. It boots into its own access point — nexmon monitor &amp; injection, KARMA rogue-AP, USB HID gadget — all driven from a clean web app. No desktop. No setup.</p>
         <div class="btns">
-          <a class="btn primary" href="#" id="dl">Download image · 435 MB</a>
-          <a class="btn ghost" href="#" id="gh2">View on GitHub</a>
+          <a class="btn primary" href="#demo">See it live</a>
+          <a class="btn ghost" href="#download">Download · 435 MB</a>
         </div>
         <div class="dlnote" id="dlnote"></div>
         <div class="meta-row">
@@ -362,6 +378,26 @@ sudo dd if=Pi-sces.img of=/dev/sdX bs=4M status=progress conv=fsync<br>
   <div class="screens" id="screens"></div>
 </section>
 
+<section id="download">
+  <div class="dlcard reveal">
+    <div class="dlleft">
+      <div class="eyebrow">Get it</div>
+      <h2>Download Pi-sces.</h2>
+      <p>One flashable image. The variant whose WiFi drivers are set to <em>work</em> with the Pisces control app — matched to the released APK, not the stock community W2 build.</p>
+      <a class="btn primary dlbig" href="#" id="dl">↓ Download image · 435 MB</a>
+      <div class="dlmeta" id="dlmeta"></div>
+    </div>
+    <div class="dlright">
+      <div class="dlflash">
+        <div class="fh">Flash it</div>
+        <p>Raspberry Pi Imager or balenaEtcher read <code>.xz</code> directly. Or CLI:</p>
+        <div class="code" style="margin-top:10px"><button data-copy>Copy</button>xz -dc Pi-sces.img.xz | sudo dd of=/dev/sdX bs=4M status=progress conv=fsync</div>
+        <p style="margin-top:12px">Then boot → join WiFi <b>P4wnP1</b> → open <code>http://172.24.0.1:8000</code></p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section id="specs">
   <div class="sec-head reveal">
     <div class="eyebrow">Tech specs</div>
@@ -397,7 +433,9 @@ var SHA="84cb4df4400f6d761e2fc7f6efdbf0d1f1ded0733dc521819d81cf376761a3f3";
 ["gh1","gh2","gh3"].forEach(function(id){var e=document.getElementById(id);if(e)e.href=REPO;});
 var dl=document.getElementById('dl'); if(dl) dl.href=DL;
 var dn=document.getElementById('dlnote');
-if(dn) dn.innerHTML='v1.0.0 · <a href="'+RELEASE+'">release notes</a> · SHA-256 <code>'+SHA.slice(0,16)+'…</code>';
+if(dn) dn.innerHTML='v1.0.0 · 435 MB · <a href="#download">download ↓</a>';
+var dm=document.getElementById('dlmeta');
+if(dm) dm.innerHTML='v1.0.0 · Pi Zero 2 W (arm64) · <a href="'+RELEASE+'">release notes</a><br>SHA-256 <code>'+SHA+'</code>';
 
 var root=document.documentElement, tb=document.getElementById('theme');
 tb.addEventListener('click',function(){
