@@ -393,7 +393,7 @@ sudo dd if=Pi-sces.img of=/dev/sdX bs=4M status=progress conv=fsync<br>
         <div class="fh">Flash it</div>
         <p>Raspberry Pi Imager or balenaEtcher read <code>.xz</code> directly. Or CLI:</p>
         <div class="code" style="margin-top:10px"><button data-copy>Copy</button>xz -dc Pi-sces.img.xz | sudo dd of=/dev/sdX bs=4M status=progress conv=fsync</div>
-        <p style="margin-top:12px">Then boot → join WiFi <b>P4wnP1</b> → open <code>http://172.24.0.1:8000</code></p>
+        <p style="margin-top:12px">Then boot → join WiFi <b>P4wnP1</b> (pass <code>MaMe82-P4wnP1</code>) → open <code>http://172.24.0.1:8000</code></p>
       </div>
     </div>
   </div>
@@ -496,7 +496,7 @@ function drawAll(){
 drawAll();
 
 // steps
-var STEPS=[['Flash','Decompress and write Pi-sces.img to a microSD card.'],['Boot','Insert the card, power the Pi Zero 2 W. First boot takes a minute.'],['Connect','Join its WiFi network "P4wnP1" from your phone or laptop.'],['Control','Open 172.24.0.1:8000 — enable nexmon, start KARMA, run scripts.']];
+var STEPS=[['Flash','Decompress and write Pi-sces.img to a microSD card.'],['Boot','Insert the card, power the Pi Zero 2 W. First boot takes a minute.'],['Connect','Join WiFi "P4wnP1" (WPA2 password: MaMe82-P4wnP1) from your phone or laptop.'],['Control','Open 172.24.0.1:8000 — enable nexmon, start KARMA, run scripts.']];
 document.getElementById('steps').innerHTML=STEPS.map(function(s,i){return '<div class="step"><div class="n">0'+(i+1)+'</div><h3>'+s[0]+'</h3><p>'+s[1]+'</p></div>';}).join('');
 
 // cases
