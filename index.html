@@ -385,6 +385,7 @@ sudo dd if=Pi-sces.img of=/dev/sdX bs=4M status=progress conv=fsync<br>
       <h2>Download Pi-sces.</h2>
       <p>One flashable image. The variant whose WiFi drivers are set to <em>work</em> with the Pisces control app — matched to the released APK, not the stock community W2 build.</p>
       <a class="btn primary dlbig" href="#" id="dl">↓ Download image · 435 MB</a>
+      <a class="btn ghost dlbig" href="#" id="dlapk" style="margin-top:12px">↓ Download Android app · APK · 15 MB</a>
       <div class="dlmeta" id="dlmeta"></div>
     </div>
     <div class="dlright">
@@ -429,13 +430,16 @@ sudo dd if=Pi-sces.img of=/dev/sdX bs=4M status=progress conv=fsync<br>
 var REPO="https://github.com/pi-sces/pi-sces.github.io";
 var RELEASE="https://github.com/pi-sces/pi-sces.github.io/releases/tag/v1.0.0";
 var DL="https://github.com/pi-sces/pi-sces.github.io/releases/download/v1.0.0/Pi-sces.img.xz";
+var APK="https://github.com/pi-sces/pi-sces.github.io/releases/download/v1.0.0/Pisces.apk";
 var SHA="84cb4df4400f6d761e2fc7f6efdbf0d1f1ded0733dc521819d81cf376761a3f3";
+var APKSHA="efb65a7eec6b12f05ea8c61b53c988ab6544b32a011874b1b71c8874a13da592";
 ["gh1","gh2","gh3"].forEach(function(id){var e=document.getElementById(id);if(e)e.href=REPO;});
 var dl=document.getElementById('dl'); if(dl) dl.href=DL;
+var da=document.getElementById('dlapk'); if(da) da.href=APK;
 var dn=document.getElementById('dlnote');
 if(dn) dn.innerHTML='v1.0.0 · 435 MB · <a href="#download">download ↓</a>';
 var dm=document.getElementById('dlmeta');
-if(dm) dm.innerHTML='v1.0.0 · Pi Zero 2 W (arm64) · <a href="'+RELEASE+'">release notes</a><br>SHA-256 <code>'+SHA+'</code>';
+if(dm) dm.innerHTML='v1.0.0 · Pi Zero 2 W (arm64) · <a href="'+RELEASE+'">release notes</a><br>Image SHA-256 <code>'+SHA+'</code><br>App APK SHA-256 <code>'+APKSHA+'</code>';
 
 var root=document.documentElement, tb=document.getElementById('theme');
 tb.addEventListener('click',function(){
