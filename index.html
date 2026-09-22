@@ -224,6 +224,10 @@ section{padding:96px 0;position:relative;z-index:2}
 .dlflash .fh{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
 .dlflash p{color:var(--muted);font-size:14px;margin:0}
 .dlflash code{font-family:var(--mono);font-size:12px;color:var(--text)}
+.secnote{display:flex;gap:12px;margin-top:16px;padding:14px 16px;border-radius:12px;background:color-mix(in srgb,var(--warn) 12%,var(--ground));border:1px solid color-mix(in srgb,var(--warn) 40%,var(--line));font-size:13px;color:var(--muted);line-height:1.5}
+.secnote svg{color:var(--warn);flex:none;margin-top:1px}
+.secnote b{color:var(--text)}
+.secnote code{font-family:var(--mono);font-size:12px;color:var(--text)}
 /* disclaimer */
 .disc{background:linear-gradient(180deg,color-mix(in srgb,var(--crit) 10%,var(--surface)),var(--surface));border:1px solid color-mix(in srgb,var(--crit) 38%,var(--line));border-radius:24px;padding:36px 40px}
 .disc h3{font-size:20px;color:var(--crit);margin-bottom:14px;display:flex;align-items:center;gap:12px}
@@ -394,6 +398,10 @@ sudo dd if=Pi-sces.img of=/dev/sdX bs=4M status=progress conv=fsync<br>
         <p>Raspberry Pi Imager or balenaEtcher read <code>.xz</code> directly. Or CLI:</p>
         <div class="code" style="margin-top:10px"><button data-copy>Copy</button>xz -dc Pi-sces.img.xz | sudo dd of=/dev/sdX bs=4M status=progress conv=fsync</div>
         <p style="margin-top:12px">Then boot → join WiFi <b>P4wnP1</b> (pass <code>MaMe82-P4wnP1</code>) → open <code>http://172.24.0.1:8000</code></p>
+      </div>
+      <div class="secnote">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.4 8 8 10 4.6-2 8-5 8-10V6z"/><path d="M12 8v4M12 16h.01"/></svg>
+        <div><b>Change the defaults before real-world use.</b> The image ships with a known AP password (<code>MaMe82-P4wnP1</code>) and SSH login (<code>root : toor</code>) — anyone who has these can reach the device. Set your own before deploying.</div>
       </div>
     </div>
   </div>
